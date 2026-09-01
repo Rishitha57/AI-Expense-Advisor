@@ -28,8 +28,23 @@ from typing import Any, Dict, Iterable, List, Optional
 import requests
 
 
+REPORT_FILES = (
+    "architecture.md",
+    "design-review.md",
+    "executive-summary.md",
+    "impl-plan.md",
+    "pr.md",
+    "requirements.md",
+    "test-report.md",
+)
+
+
 class ConfluenceSyncError(RuntimeError):
     """Raised when Confluence synchronization fails."""
+
+    def __init__(self, message: str, status_code: Optional[int] = None):
+        super().__init__(message)
+        self.status_code = status_code
 
 
 def get_required_env() -> Dict[str, str]:
@@ -75,9 +90,10 @@ def request_json(
         raise ConfluenceSyncError(f"Confluence request failed for {method} {url}: {exc}") from exc
 
     if response.status_code >= 400:
-        detail = response.text[:500]
+        detail = " ".join(response.text.split())[:500] or "No response body"
         raise ConfluenceSyncError(
-            f"Confluence request returned HTTP {response.status_code} for {method} {url}: {detail}"
+            f"Confluence request returned HTTP {response.status_code} for {method} {url}: {detail}",
+            status_code=response.status_code,
         )
 
     if not response.content:
@@ -87,7 +103,9 @@ def request_json(
         return response.json()
     except ValueError as exc:
         raise ConfluenceSyncError(
-            f"Confluence response was not valid JSON for {method} {url}: {response.text[:500]}"
+            "Confluence returned a non-JSON response "
+            f"for {method} {url} (HTTP {response.status_code}); "
+            "check the base URL, credentials, and API permissions."
         ) from exc
 
 
@@ -149,8 +167,15 @@ def get_page_by_title(
 
     try:
         data = request_json(session, "GET", endpoint, params=params)
-    except ConfluenceSyncError:
-        return None
+    except ConfluenceSyncError as exc:
+        if exc.status_code == 404:
+            print(
+                f"Warning: Confluence page lookup returned 404 for '{title}'; "
+                "the page will be created if possible.",
+                file=sys.stderr,
+            )
+            return None
+        raise
 
     results = data.get("results", [])
     if not results:
@@ -254,7 +279,11 @@ def sync_execution_reports(session: requests.Session, base_url: str, space_key: 
         raise ConfluenceSyncError("Docs directory not found: docs")
 
     synced_titles: List[str] = []
-    for path in sorted(docs_dir.glob("*.md")):
+    report_files = [docs_dir / filename for filename in REPORT_FILES]
+    for path in report_files:
+        if not path.is_file():
+            raise ConfluenceSyncError(f"Required report file not found: {path}")
+
         stem = path.stem
         title = " ".join(part.capitalize() for part in re.split(r"[-_\s]+", stem) if part)
 
@@ -270,6 +299,8 @@ def sync_execution_reports(session: requests.Session, base_url: str, space_key: 
             title = "Executive Summary"
         elif stem.lower() == "architecture":
             title = "Architecture"
+        elif stem.lower() == "test-report":
+            title = "AI Expense Advisor Test Execution Report"
 
         body = read_file(path)
         page = create_or_update_page(

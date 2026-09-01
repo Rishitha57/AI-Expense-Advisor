@@ -40,7 +40,7 @@ jobs:
 
       - name: Run pytest suite
         run: |
-          pytest -q
+          pytest -q --junitxml=test-results.xml
 
       - name: Stop FastAPI server
         if: always()
@@ -64,4 +64,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: sdlc-deliverable-reports
-          path: docs/
+          path: |
+            docs/
+            test-results.xml
