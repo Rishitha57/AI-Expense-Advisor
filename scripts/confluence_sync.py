@@ -36,7 +36,6 @@ REPORT_FILES = (
     "pr.md",
     "requirements.md",
     "test-report.md",
-    "test-execution-report.html",
 )
 
 
@@ -303,8 +302,6 @@ def sync_execution_reports(session: requests.Session, base_url: str, space_key: 
             title = "Architecture"
         elif stem.lower() == "test-report":
             title = "AI Expense Advisor Test Execution Report"
-        elif stem.lower() == "test-execution-report":
-            title = "AI Expense Advisor Test Execution Report"
 
         body = read_file(path)
         page = create_or_update_page(
@@ -314,7 +311,6 @@ def sync_execution_reports(session: requests.Session, base_url: str, space_key: 
             title=title,
             markdown_content=body,
             parent_title="AI Expense Advisor Project Docs",
-            storage_html=path.suffix.lower() == ".html",
         )
         synced_titles.append(page.get("title", title))
 

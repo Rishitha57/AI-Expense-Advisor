@@ -40,7 +40,11 @@ jobs:
 
       - name: Run pytest suite
         run: |
-          pytest --html=docs/test-execution-report.html --self-contained-html
+          set +e
+          pytest --html=docs/test-execution-report.html --self-contained-html --junitxml=test-results.xml
+          TEST_EXIT_CODE=$?
+          python scripts/generate_test_report.py --junitxml test-results.xml --output docs/test-report.md
+          exit $TEST_EXIT_CODE
 
       - name: Stop FastAPI server
         if: always()
