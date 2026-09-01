@@ -32,9 +32,27 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install pytest requests fastapi uvicorn sqlalchemy
 
+      - name: Start FastAPI server for integration tests
+        run: |
+          nohup uvicorn main:app --host 127.0.0.1 --port 8000 > /tmp/ai-expense-advisor.log 2>&1 &
+          echo $! > /tmp/ai-expense-advisor.pid
+          sleep 5
+
       - name: Run pytest suite
         run: |
           pytest -q
+
+      - name: Stop FastAPI server
+        if: always()
+        run: |
+          if [ -f /tmp/ai-expense-advisor.pid ]; then
+            PID=$(cat /tmp/ai-expense-advisor.pid)
+            if kill -0 "$PID" 2>/dev/null; then
+              kill "$PID"
+              wait "$PID" 2>/dev/null || true
+            fi
+            rm -f /tmp/ai-expense-advisor.pid
+          fi
 
       - name: Sync requirements and execution reports to Confluence
         if: ${{ success() }}
