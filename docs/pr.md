@@ -50,7 +50,17 @@ This result was validated using the smoke test script in [tests/test_api_smoke.p
 
 ---
 
-## 4. Known Limitations
+## 4. Error Handling & Robustness Validation
+The API smoke-test suite includes dedicated negative cases alongside the positive transaction ingestion flow:
+- Malformed transaction payloads with missing required fields return a structured `422` or `400` validation response.
+- Requests for non-existent transactions return `404 Not Found` with the expected `Transaction not found` detail.
+- Invalid transaction identifiers return `422`, and unsupported query parameters are handled gracefully without a server error.
+
+The tests were executed with verbose pytest reporting so positive and negative outcomes are collected and visible as separate test results. This validates predictable API behavior for malformed input, missing resources, and common request-boundary errors.
+
+---
+
+## 5. Known Limitations
 - The application currently uses SQLite for local development, not PostgreSQL as described in the target architecture.
 - Authentication and user-level authorization are not yet fully hardened or production-ready.
 - GDPR/privacy handling and data retention controls are still pending the security/compliance follow-up noted in the design review.
@@ -60,7 +70,7 @@ This result was validated using the smoke test script in [tests/test_api_smoke.p
 
 ---
 
-## 5. Reviewer Checklist
+## 6. Reviewer Checklist
 - [ ] The application architecture matches the intended capstone scope and MVP direction.
 - [ ] Transaction ingestion endpoint is functioning and persisting data correctly.
 - [ ] API behavior is validated by the live smoke test evidence.

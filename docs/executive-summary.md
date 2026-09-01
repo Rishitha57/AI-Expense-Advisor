@@ -107,6 +107,14 @@ Quality checks were performed using a combination of live API smoke tests and au
 ### Current Status
 The project demonstrates solid MVP validation while also recognizing that production hardening, larger test coverage, and expanded compliance controls remain logical next steps.
 
+### Error Handling & Robustness Validation
+Negative API scenarios were added to the smoke-test suite and executed through the FastAPI application:
+- Malformed transaction payloads, including missing required fields, return a validation error (`422` or `400`) with structured detail.
+- Requests for non-existent transactions return `404 Not Found` with a clear `Transaction not found` message.
+- Invalid transaction identifiers return `422`, while unsupported query parameters are handled without a server error.
+
+These checks confirm that common client mistakes and missing-resource edge cases are handled predictably rather than producing unhandled server failures. The suite reports both positive and negative cases individually in verbose pytest output.
+
 ---
 
 ## 5. Confluence & GitHub Integration Summary
