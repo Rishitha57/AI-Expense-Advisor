@@ -1,0 +1,26 @@
+[
+  {
+    "amount": 45.75,
+    "currency": "USD",
+    "merchant": "Whole Foods",
+    "description": "Groceries",
+    "transaction_date": "2026-08-31T12:00:00Z",
+    "source": "manual"
+  },
+  {
+    "amount": 18.5,
+    "currency": "USD",
+    "merchant": "Starbucks",
+    "description": "Coffee and breakfast",
+    "transaction_date": "2026-08-30T08:30:00Z",
+    "source": "manual"
+  },
+  {
+    "amount": 72.0,
+    "currency": "USD",
+    "merchant": "Uber",
+    "description": "Ride to office",
+    "transaction_date": "2026-08-29T18:15:00Z",
+    "source": "manual"
+  }
+]

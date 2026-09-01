@@ -1,0 +1,42 @@
+You are performing a code review for this repository.
+
+Review the provided code changes with a strict engineering lens and evaluate them against the following criteria:
+
+1. Correctness
+- Verify that the logic matches the intended behavior and requirements.
+- Check for edge cases, invalid inputs, boundary conditions, and broken assumptions.
+- Identify any bugs, regressions, or incorrect data handling.
+- Call out missing validation or incorrect control flow.
+
+2. Security
+- Look for unsafe patterns such as injection vulnerabilities, improper auth/session handling, insecure defaults, secret exposure, or unsafe serialization/deserialization.
+- Check for input validation gaps, trust-boundary violations, and risky external calls.
+- Flag anything that could lead to data leakage, privilege escalation, or misuse.
+- Note if security requirements from project policy or GDPR expectations are not addressed.
+
+3. Error Handling
+- Assess whether failures are handled gracefully and explicitly.
+- Check for missing exceptions, silent failures, poor logging, or unhandled edge cases.
+- Ensure APIs, services, and background jobs fail predictably and with useful diagnostics.
+- Highlight places where errors may crash the app or leave the system in a bad state.
+
+4. DRY (Don’t Repeat Yourself)
+- Identify duplicated logic, repeated condition checks, copy-pasted implementations, or inconsistent patterns that should be centralized.
+- Suggest abstraction opportunities where reusable helpers, shared validation, or common patterns would improve maintainability.
+- Flag code that is unnecessarily repetitive and difficult to extend safely.
+
+Review instructions:
+- Be specific and actionable: reference the exact file, function, or code path when possible.
+- Prioritize issues by severity: critical, high, medium, or low.
+- Distinguish between definite findings and assumptions.
+- Provide constructive remediation suggestions.
+- Keep findings concise but technically precise.
+- If the code is strong, explicitly mention what is working well.
+
+Output format:
+- Summary: brief overall assessment
+- Findings: list each issue with severity, location, explanation, and recommendation
+- Strengths: note good patterns or design choices
+- Final Verdict: approve / request changes / needs discussion
+
+Use the repository context and project constraints when evaluating the code, including correctness, operational safety, maintainability, and compliance requirements.
