@@ -249,18 +249,27 @@ def sync_requirements_page(session: requests.Session, base_url: str, space_key: 
 
 
 def sync_execution_reports(session: requests.Session, base_url: str, space_key: str) -> List[str]:
-    report_files = [
-        ("AI Expense Advisor Design Review", "docs/design-review.md"),
-        ("AI Expense Advisor Implementation Plan", "docs/impl-plan.md"),
-        ("AI Expense Advisor Pull Request", "docs/pr.md"),
-    ]
+    docs_dir = Path("docs")
+    if not docs_dir.exists():
+        raise ConfluenceSyncError("Docs directory not found: docs")
 
     synced_titles: List[str] = []
-    for title, relative_path in report_files:
-        path = Path(relative_path)
-        if not path.exists():
-            print(f"Skipping missing report: {relative_path}", file=sys.stderr)
-            continue
+    for path in sorted(docs_dir.glob("*.md")):
+        stem = path.stem
+        title = " ".join(part.capitalize() for part in re.split(r"[-_\s]+", stem) if part)
+
+        if stem.lower() == "requirements":
+            title = "AI Expense Advisor Requirements"
+        elif stem.lower() == "pr":
+            title = "AI Expense Advisor Pull Request"
+        elif stem.lower() == "impl-plan":
+            title = "AI Expense Advisor Implementation Plan"
+        elif stem.lower() == "design-review":
+            title = "AI Expense Advisor Design Review"
+        elif stem.lower() == "executive-summary":
+            title = "Executive Summary"
+        elif stem.lower() == "architecture":
+            title = "Architecture"
 
         body = read_file(path)
         page = create_or_update_page(
