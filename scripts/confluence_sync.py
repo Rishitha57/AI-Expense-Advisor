@@ -36,6 +36,7 @@ REPORT_FILES = (
     "pr.md",
     "requirements.md",
     "test-report.md",
+    "test-execution-report.html",
 )
 
 
@@ -223,6 +224,7 @@ def create_or_update_page(
     title: str,
     markdown_content: str,
     parent_title: Optional[str] = None,
+    storage_html: bool = False,
 ) -> Dict[str, Any]:
     page = get_page_by_title(session, base_url, space_key, title)
 
@@ -231,7 +233,7 @@ def create_or_update_page(
     else:
         parent_id = None
 
-    html_body = markdown_to_storage_html(markdown_content)
+    html_body = markdown_content if storage_html else markdown_to_storage_html(markdown_content)
 
     if page:
         page_id = str(page["id"])
@@ -301,6 +303,8 @@ def sync_execution_reports(session: requests.Session, base_url: str, space_key: 
             title = "Architecture"
         elif stem.lower() == "test-report":
             title = "AI Expense Advisor Test Execution Report"
+        elif stem.lower() == "test-execution-report":
+            title = "AI Expense Advisor Test Execution Report"
 
         body = read_file(path)
         page = create_or_update_page(
@@ -310,6 +314,7 @@ def sync_execution_reports(session: requests.Session, base_url: str, space_key: 
             title=title,
             markdown_content=body,
             parent_title="AI Expense Advisor Project Docs",
+            storage_html=path.suffix.lower() == ".html",
         )
         synced_titles.append(page.get("title", title))
 

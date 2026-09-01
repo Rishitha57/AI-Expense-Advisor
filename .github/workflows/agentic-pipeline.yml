@@ -30,7 +30,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install pytest requests fastapi uvicorn sqlalchemy httpx
+          python -m pip install pytest pytest-html requests fastapi uvicorn sqlalchemy httpx
 
       - name: Start FastAPI server for integration tests
         run: |
@@ -40,7 +40,7 @@ jobs:
 
       - name: Run pytest suite
         run: |
-          pytest -q --junitxml=test-results.xml
+          pytest --html=docs/test-execution-report.html --self-contained-html
 
       - name: Stop FastAPI server
         if: always()
@@ -66,4 +66,3 @@ jobs:
           name: sdlc-deliverable-reports
           path: |
             docs/
-            test-results.xml
